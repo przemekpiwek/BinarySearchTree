@@ -67,6 +67,8 @@ class Tree {
       console.log("Node not found");
     } else if (value === this.root.value) {
       console.log("to be done");
+      this.root = removedNodeChildren;
+      this.root = null;
     } else {
       if (parent.right) {
         if (parent.right.value === nodeToRemove.value) {
@@ -87,6 +89,9 @@ class Tree {
     while (testNode) {
       parent = curNode;
       curNode = testNode;
+      if (curNode.value === value) {
+        break;
+      }
       testNode = testNode.value > value ? testNode.left : testNode.right;
     }
     return { curNode, parent };
