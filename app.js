@@ -22,13 +22,15 @@ class Node {
   }
   createDom() {
     let nodeEl = document.createElement("inline-block");
+    let nodeText = document.createElement("p");
     // nodeEl.style.left = this.positionX;
     // nodeEl.style.top = this.positionY;
     nodeEl.style.gridColumnStart = `${this.colCell}`;
     nodeEl.style.gridRowStart = `${this.rowCell}`;
-    nodeEl.innerText = `${this.value}`;
+    nodeText.innerText = `${this.value}`;
     nodeEl.id = this.value;
     nodeEl.classList.add("node");
+    nodeEl.appendChild(nodeText);
     grid.appendChild(nodeEl);
   }
 }
