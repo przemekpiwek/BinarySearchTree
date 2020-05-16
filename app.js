@@ -6,24 +6,30 @@
 //if less, go left -- parent.left is the node
 //if higher, go right -- parent.right is the node
 
-const body = document.querySelector("body");
+const grid = document.querySelector(".grid");
+let tester = [];
 
 class Node {
   constructor(value) {
     this.value = value;
     this.left = null;
     this.right = null;
-    this.positionX = null;
-    this.positionY = null;
+    // this.positionX = null;
+    // this.positionY = null;
+    this.rowCell = null;
+    this.colCell = null;
+    // this.arrayOfNodes = [];
   }
   createDom() {
     let nodeEl = document.createElement("inline-block");
-    nodeEl.style.left = this.positionX;
-    nodeEl.style.top = this.positionY;
+    // nodeEl.style.left = this.positionX;
+    // nodeEl.style.top = this.positionY;
+    nodeEl.style.gridColumnStart = `${this.colCell}`;
+    nodeEl.style.gridRowStart = `${this.rowCell}`;
     nodeEl.innerText = `${this.value}`;
     nodeEl.id = this.value;
     nodeEl.classList.add("node");
-    body.appendChild(nodeEl);
+    grid.appendChild(nodeEl);
   }
 }
 
@@ -38,18 +44,24 @@ class Tree {
     if (this.root === null) {
       this.root = newNode;
       curNode = newNode;
-      curNode.positionX = `${window.innerWidth / 2 - 50}px`;
-      curNode.positionY = "0px";
+      curNode.rowCell = 1;
+      curNode.colCell = 4;
+      // curNode.positionX = `${window.innerWidth / 2 - 50}px`;
+      // curNode.positionY = "0px";
     } else {
       curNode = this.searchForNode(value)["curNode"];
       if (curNode.value > newNode.value) {
         curNode.left = newNode;
-        newNode.positionX = `${parseInt(curNode.positionX, 10) - 100}px`;
-        newNode.positionY = `${parseInt(curNode.positionY, 10) + 100}px`;
+        newNode.rowCell = curNode.rowCell + 1;
+        newNode.colCell = curNode.colCell - 1;
+        // newNode.positionX = `${parseInt(curNode.positionX, 10) - 100}px`;
+        // newNode.positionY = `${parseInt(curNode.positionY, 10) + 100}px`;
       } else {
         curNode.right = newNode;
-        newNode.positionX = `${parseInt(curNode.positionX, 10) + 100}px`;
-        newNode.positionY = `${parseInt(curNode.positionY, 10) + 100}px`;
+        newNode.rowCell = curNode.rowCell + 1;
+        newNode.colCell = curNode.colCell + 1;
+        // newNode.positionX = `${parseInt(curNode.positionX, 10) + 100}px`;
+        // newNode.positionY = `${parseInt(curNode.positionY, 10) + 100}px`;
       }
     }
     newNode.createDom();
@@ -59,27 +71,25 @@ class Tree {
     const nodeToRemove = curNode;
     const removedNodeChildren = this.mergeSubBranch(nodeToRemove);
     const nodeDom = document.getElementById(`${nodeToRemove.value}`);
-    console.log(parent);
-    console.log(nodeDom);
-    console.log(nodeToRemove);
 
     if (!nodeToRemove) {
       console.log("Node not found");
     } else if (value === this.root.value) {
-      console.log("to be done");
       this.root = removedNodeChildren;
       this.root = null;
     } else {
       if (parent.right) {
         if (parent.right.value === nodeToRemove.value) {
           parent.right = removedNodeChildren;
+          // this.adjustPosition("right", removedNodeChildren);
         }
       } else {
         parent.left = removedNodeChildren;
+        // this.adjustPosition("left", removedNodeChildren);
       }
     }
 
-    body.removeChild(nodeDom);
+    grid.removeChild(nodeDom);
   }
   searchForNode(value) {
     let testNode = this.root;
@@ -92,7 +102,7 @@ class Tree {
       if (curNode.value === value) {
         break;
       }
-      testNode = testNode.value > value ? testNode.left : testNode.right;
+      testNode = testNode.value > value ? curNode.left : curNode.right;
     }
     return { curNode, parent };
   }
@@ -100,9 +110,15 @@ class Tree {
     if (node.right) {
       let leftestNode = this.mostLeft(node.right);
       leftestNode.left = node.left;
+      leftestNode.left.colCell = leftestNode.colCell - 1;
+      leftestNode.left.rowCell = leftestNode.rowCell + 1;
+      //coming from right side
+      this.adjustPosition("right", node.right);
       return node.right;
     } else {
+      this.adjustPosition("left", node.left);
       return node.left;
+      //coming from left side
     }
   }
   mostLeft(node) {
@@ -118,7 +134,43 @@ class Tree {
       return lastNode;
     }
   }
-  adjustPosition() {}
+  adjustPosition(dir, subBranch) {
+    this.arrayNodes(subBranch);
+    let nodeArr = tester;
+    if (dir === "right") {
+      nodeArr.forEach((node) => {
+        console.log(node);
+        node.colCell -= 1;
+        node.rowCell -= 1;
+      });
+    } else {
+      nodeArr.forEach((node) => {
+        console.log(node);
+        node.colCell += 1;
+        node.rowCell -= 1;
+      });
+    }
+  }
+  //tester array not having correct node list
+  arrayNodes(branch) {
+    let firstNode = branch;
+    if (!firstNode.right && !firstNode.left) {
+      return;
+    } else if (firstNode.left && firstNode.right) {
+      tester.push(firstNode);
+      this.arrayNodes(firstNode.right);
+      this.arrayNodes(firstNode.left);
+    } else if (firstNode.right) {
+      tester.push(firstNode);
+      this.arrayNodes(firstNode.right);
+    } else if (firstNode.left) {
+      tester.push(firstNode);
+      this.arrayNodes(firstNode.left);
+    }
+    console.log(this.arrayOfNodes);
+    //need someway of clearing array
+  }
 }
 
 let tree = new Tree();
+// setInterval(render(), 1000);
