@@ -1,20 +1,14 @@
-// Tree Object, will act as wrapper for root node -- required:
-// root initially set to node
-
-//add node method on tree object
-//check against root node, if not set, set as root, otherwise,
-//if less, go left -- parent.left is the node
-//if higher, go right -- parent.right is the node
-
 const grid = document.querySelector(".grid");
 const addButt = document.querySelector("#addButton");
 const remButt = document.querySelector("#removeButton");
 const addInput = document.querySelector("#addNodeInput");
 const remInput = document.querySelector("#removeNodeInput");
-let tester = [];
+let arrayOfNodesToRemove = [];
 
 addButt.addEventListener("click", addNodeHandler);
 remButt.addEventListener("click", remNodeHandler);
+addInput.addEventListener("keypress", addNodeHandler);
+remInput.addEventListener("keypress", remNodeHandler);
 
 class Node {
   constructor(value) {
@@ -59,6 +53,7 @@ class Tree {
     } else {
       curNode = this.searchForNode(value)["curNode"];
       if (curNode.value > newNode.value) {
+        console.log(`the ${value} is lower than the new node`);
         curNode.left = newNode;
         newNode.rowCell = curNode.rowCell + 1;
         newNode.colCell = curNode.colCell - 1;
@@ -75,28 +70,24 @@ class Tree {
     newNode.createDom();
   }
   removeNode(value) {
-    const { curNode, parent } = this.searchForNode(value);
-    const nodeToRemove = curNode;
-    const removedNodeChildren = this.mergeSubBranch(nodeToRemove);
-    const removedNodeDom = document.getElementById(`${nodeToRemove.value}`);
-    console.log(`removing node ${nodeToRemove}`);
-    console.log(`removing node children ${removedNodeChildren}`);
+    const { curNode: nodeToRemove, parent } = this.searchForNode(value);
+    console.log(nodeToRemove);
     if (!nodeToRemove) {
       console.log("Node not found");
-    } else if (value === this.root.value) {
-      this.root = removedNodeChildren;
-      this.root = null;
     } else {
-      if (parent.right) {
-        if (parent.right.value === nodeToRemove.value) {
-          parent.right = removedNodeChildren;
-        }
+      const removedNodeChildren = this.mergeSubBranch(nodeToRemove);
+      const removedNodeDom = document.getElementById(`${nodeToRemove.value}`);
+      if (value === this.root.value) {
+        this.root = removedNodeChildren;
+        this.root = null;
+        //need to adjust position
+      } else if (parent.right && parent.right.value === nodeToRemove.value) {
+        parent.right = removedNodeChildren;
       } else {
         parent.left = removedNodeChildren;
       }
+      grid.removeChild(removedNodeDom);
     }
-
-    grid.removeChild(removedNodeDom);
   }
   searchForNode(value) {
     let testNode = this.root;
@@ -114,18 +105,17 @@ class Tree {
     return { curNode, parent };
   }
   mergeSubBranch(node) {
-    //does not include the node in argument
-    if (node.right) {
-      if (node.left) {
-        let leftestNodeOfRight = this.mostLeft(node.right);
-        leftestNodeOfRight.left = node.left;
-        this.adjustPosition("move left branch", leftestNodeOfRight.left);
-        this.adjustPosition("from right", node.right);
-        return node.right;
-      } else {
-        this.adjustPosition("from left", node.left);
-        return node.left;
-      }
+    if (!node) {
+      return;
+    } else if (node.right) {
+      let leftestNodeOfRight = this.mostLeft(node.right);
+      leftestNodeOfRight.left = node.left;
+      this.adjustPosition("move left branch", leftestNodeOfRight.left);
+      this.adjustPosition("from right", node.right);
+      return node.right;
+    } else {
+      this.adjustPosition("from left", node.left);
+      return node.left;
     }
   }
   mostLeft(node) {
@@ -147,7 +137,7 @@ class Tree {
       return;
     } else {
       this.arrayNodes(subBranch);
-      let nodeArr = tester;
+      let nodeArr = arrayOfNodesToRemove;
       if (dir === "from right") {
         nodeArr.forEach((node) => {
           const nodeDom = document.getElementById(`${node.value}`);
@@ -173,12 +163,11 @@ class Tree {
           nodeDom.style.gridRowStart = node.rowCell;
         });
       }
-      tester = [];
+      arrayOfNodesToRemove = [];
     }
   }
-  //tester array not having correct node list
   arrayNodes(node) {
-    tester.push(node);
+    arrayOfNodesToRemove.push(node);
     if (!node.right && !node.left) {
       return;
     } else if (node.left && node.right) {
@@ -192,16 +181,24 @@ class Tree {
   }
 }
 
-let tree = new Tree();
-
-// function render() {}
-function addNodeHandler() {
-  if (addInput.value) {
-    tree.addNode(addInput.value);
-    addInput.value = null;
+function addNodeHandler(e) {
+  console.log(e);
+  if (e.keyCode == 13 || e.type == "click") {
+    if (addInput.value) {
+      console.log(addInput.value);
+      tree.addNode(addInput.value);
+      addInput.value = null;
+    }
   }
 }
-function remNodeHandler() {
-  tree.removeNode(remInput.value);
-  remInput.value = null;
+function remNodeHandler(e) {
+  if (e.keyCode == 13 || e.type == "click") {
+    if (remInput.value) {
+      console.log(remInput.value);
+      tree.removeNode(remInput.value);
+      remInput.value = null;
+    }
+  }
 }
+
+let tree = new Tree();
