@@ -7,7 +7,14 @@
 //if higher, go right -- parent.right is the node
 
 const grid = document.querySelector(".grid");
+const addButt = document.querySelector("#addButton");
+const remButt = document.querySelector("#removeButton");
+const addInput = document.querySelector("#addNodeInput");
+const remInput = document.querySelector("#removeNodeInput");
 let tester = [];
+
+addButt.addEventListener("click", addNodeHandler);
+remButt.addEventListener("click", remNodeHandler);
 
 class Node {
   constructor(value) {
@@ -18,7 +25,6 @@ class Node {
     // this.positionY = null;
     this.rowCell = null;
     this.colCell = null;
-    // this.arrayOfNodes = [];
   }
   createDom() {
     let nodeEl = document.createElement("inline-block");
@@ -47,7 +53,7 @@ class Tree {
       this.root = newNode;
       curNode = newNode;
       curNode.rowCell = 1;
-      curNode.colCell = 4;
+      curNode.colCell = 6;
       // curNode.positionX = `${window.innerWidth / 2 - 50}px`;
       // curNode.positionY = "0px";
     } else {
@@ -72,8 +78,9 @@ class Tree {
     const { curNode, parent } = this.searchForNode(value);
     const nodeToRemove = curNode;
     const removedNodeChildren = this.mergeSubBranch(nodeToRemove);
-    const nodeDom = document.getElementById(`${nodeToRemove.value}`);
-
+    const removedNodeDom = document.getElementById(`${nodeToRemove.value}`);
+    console.log(`removing node ${nodeToRemove}`);
+    console.log(`removing node children ${removedNodeChildren}`);
     if (!nodeToRemove) {
       console.log("Node not found");
     } else if (value === this.root.value) {
@@ -83,15 +90,13 @@ class Tree {
       if (parent.right) {
         if (parent.right.value === nodeToRemove.value) {
           parent.right = removedNodeChildren;
-          // this.adjustPosition("right", removedNodeChildren);
         }
       } else {
         parent.left = removedNodeChildren;
-        // this.adjustPosition("left", removedNodeChildren);
       }
     }
 
-    grid.removeChild(nodeDom);
+    grid.removeChild(removedNodeDom);
   }
   searchForNode(value) {
     let testNode = this.root;
@@ -109,18 +114,18 @@ class Tree {
     return { curNode, parent };
   }
   mergeSubBranch(node) {
+    //does not include the node in argument
     if (node.right) {
-      let leftestNode = this.mostLeft(node.right);
-      leftestNode.left = node.left;
-      leftestNode.left.colCell = leftestNode.colCell - 1;
-      leftestNode.left.rowCell = leftestNode.rowCell + 1;
-      //coming from right side
-      this.adjustPosition("right", node.right);
-      return node.right;
-    } else {
-      this.adjustPosition("left", node.left);
-      return node.left;
-      //coming from left side
+      if (node.left) {
+        let leftestNodeOfRight = this.mostLeft(node.right);
+        leftestNodeOfRight.left = node.left;
+        this.adjustPosition("move left branch", leftestNodeOfRight.left);
+        this.adjustPosition("from right", node.right);
+        return node.right;
+      } else {
+        this.adjustPosition("from left", node.left);
+        return node.left;
+      }
     }
   }
   mostLeft(node) {
@@ -137,42 +142,66 @@ class Tree {
     }
   }
   adjustPosition(dir, subBranch) {
-    this.arrayNodes(subBranch);
-    let nodeArr = tester;
-    if (dir === "right") {
-      nodeArr.forEach((node) => {
-        console.log(node);
-        node.colCell -= 1;
-        node.rowCell -= 1;
-      });
+    //adjusting the row and column position of all cells in new branch
+    if (!subBranch) {
+      return;
     } else {
-      nodeArr.forEach((node) => {
-        console.log(node);
-        node.colCell += 1;
-        node.rowCell -= 1;
-      });
+      this.arrayNodes(subBranch);
+      let nodeArr = tester;
+      if (dir === "from right") {
+        nodeArr.forEach((node) => {
+          const nodeDom = document.getElementById(`${node.value}`);
+          node.colCell -= 1;
+          node.rowCell -= 1;
+          nodeDom.style.gridColumnStart = node.colCell;
+          nodeDom.style.gridRowStart = node.rowCell;
+        });
+      } else if (dir === "from left") {
+        nodeArr.forEach((node) => {
+          const nodeDom = document.getElementById(`${node.value}`);
+          node.colCell += 1;
+          node.rowCell -= 1;
+          nodeDom.style.gridColumnStart = node.colCell;
+          nodeDom.style.gridRowStart = node.rowCell;
+        });
+      } else if (dir === "move left branch") {
+        nodeArr.forEach((node) => {
+          const nodeDom = document.getElementById(`${node.value}`);
+          node.colCell += 1;
+          node.rowCell += 1;
+          nodeDom.style.gridColumnStart = node.colCell;
+          nodeDom.style.gridRowStart = node.rowCell;
+        });
+      }
+      tester = [];
     }
   }
   //tester array not having correct node list
-  arrayNodes(branch) {
-    let firstNode = branch;
-    if (!firstNode.right && !firstNode.left) {
+  arrayNodes(node) {
+    tester.push(node);
+    if (!node.right && !node.left) {
       return;
-    } else if (firstNode.left && firstNode.right) {
-      tester.push(firstNode);
-      this.arrayNodes(firstNode.right);
-      this.arrayNodes(firstNode.left);
-    } else if (firstNode.right) {
-      tester.push(firstNode);
-      this.arrayNodes(firstNode.right);
-    } else if (firstNode.left) {
-      tester.push(firstNode);
-      this.arrayNodes(firstNode.left);
+    } else if (node.left && node.right) {
+      this.arrayNodes(node.right);
+      this.arrayNodes(node.left);
+    } else if (!node.left) {
+      this.arrayNodes(node.right);
+    } else if (!node.right) {
+      this.arrayNodes(node.left);
     }
-    console.log(this.arrayOfNodes);
-    //need someway of clearing array
   }
 }
 
 let tree = new Tree();
-// setInterval(render(), 1000);
+
+// function render() {}
+function addNodeHandler() {
+  if (addInput.value) {
+    tree.addNode(addInput.value);
+    addInput.value = null;
+  }
+}
+function remNodeHandler() {
+  tree.removeNode(remInput.value);
+  remInput.value = null;
+}
