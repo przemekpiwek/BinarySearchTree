@@ -10,6 +10,7 @@ addButt.addEventListener("click", addNodeHandler);
 remButt.addEventListener("click", remNodeHandler);
 addInput.addEventListener("keypress", addNodeHandler);
 remInput.addEventListener("keypress", remNodeHandler);
+window.addEventListener("resize", windowHandler);
 
 class Node {
   constructor(value) {
@@ -18,7 +19,6 @@ class Node {
     this.right = null;
     this.rowCell = null;
     this.colCell = null;
-
     this.positionX = null;
     this.positionY = null;
   }
@@ -181,39 +181,68 @@ class Tree {
 
   createLines(node) {
     //pass in new node
-    let nodeObj = $(`#${node.value}`);
-    let nodePos = nodeObj.position();
     let svg = document.querySelector("svg");
+    const nodePos = document
+      .getElementById(`${node.value}`)
+      .getBoundingClientRect();
+
+    console.log(nodePos);
 
     if (node.left) {
-      let nodeLeft = $(`#${node.left.value}`);
-      let leftPos = nodeLeft.position();
+      const leftPos = document
+        .getElementById(`${node.left.value}`)
+        .getBoundingClientRect();
       let newLine = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "line"
       );
+
+      // console.log(leftPos);
+
       newLine.setAttribute("id", "line");
-      newLine.setAttribute("x1", `${nodePos.left + 80}`);
-      newLine.setAttribute("y1", `${nodePos.top - 80}`);
-      newLine.setAttribute("x2", `${leftPos.left + 80}`);
-      newLine.setAttribute("y2", `${leftPos.top - 80}`);
+      newLine.setAttribute("x1", `${nodePos.x + 90 - (6 - node.colCell) * 10}`);
+      newLine.setAttribute(
+        "y1",
+        `${nodePos.top + 22.5 - 100 + (node.rowCell - 1) * 10}`
+      );
+      newLine.setAttribute(
+        "x2",
+        `${leftPos.x + 90 - (6 - node.left.colCell) * 10}`
+      );
+      newLine.setAttribute(
+        "y2",
+        `${leftPos.top + 22.5 - 110 + node.left.rowCell * 10}`
+      );
       newLine.setAttribute("stroke", "white");
       newLine.setAttribute("stroke-width", "3");
       svg.appendChild(newLine);
       this.createLines(node.left);
     }
     if (node.right) {
-      let nodeRight = $(`#${node.right.value}`);
-      let rightPos = nodeRight.position();
+      const rightPos = document
+        .getElementById(`${node.right.value}`)
+        .getBoundingClientRect();
       let newLine = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "line"
       );
+
+      // console.log(rightPos);
+
       newLine.setAttribute("id", "line");
-      newLine.setAttribute("x1", `${nodePos.left + 80}`);
-      newLine.setAttribute("y1", `${nodePos.top - 80}`);
-      newLine.setAttribute("x2", `${rightPos.left + 80}`);
-      newLine.setAttribute("y2", `${rightPos.top - 80}`);
+      newLine.setAttribute("x1", `${nodePos.x + 90 + (node.colCell - 6) * 10}`);
+      newLine.setAttribute(
+        "y1",
+        `${nodePos.y + 22.5 - 100 + (node.rowCell - 1) * 10}`
+      );
+      newLine.setAttribute(
+        "x2",
+        `${rightPos.x + 90 + (node.right.colCell - 6) * 10}`
+      );
+      newLine.setAttribute(
+        "y2",
+        `${rightPos.y + 22.5 - 110 + node.right.rowCell * 10}`
+      );
       newLine.setAttribute("stroke", "white");
       newLine.setAttribute("stroke-width", "3");
       svg.appendChild(newLine);
@@ -229,7 +258,6 @@ class Tree {
 }
 
 function addNodeHandler(e) {
-  console.log(e);
   if (e.keyCode == 13 || e.type == "click") {
     if (addInput.value) {
       tree.addNode(Number(addInput.value));
@@ -244,6 +272,10 @@ function remNodeHandler(e) {
       remInput.value = null;
     }
   }
+}
+function windowHandler() {
+  tree.clearLines();
+  tree.createLines(tree.root);
 }
 
 let tree = new Tree();

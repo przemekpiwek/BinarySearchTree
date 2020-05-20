@@ -18,6 +18,8 @@ body {
 }
 .cell {
   background: #1f1c60;
+  display: flex;
+  justify-content: center;
 }
 header {
   background-color: #100e1a;
@@ -82,7 +84,7 @@ button:hover {
   position: absolute;
   background: #100e1a;
   top: 30px;
-  left: 95px;
+  left: 580px;
   z-index: 1;
 }
 #removeButton::after {
@@ -93,7 +95,7 @@ button:hover {
   position: absolute;
   background: #100e1a;
   top: 30px;
-  left: 1028px;
+  left: 1030px;
   z-index: 1;
 }
 .node {
