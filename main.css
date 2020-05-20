@@ -16,15 +16,19 @@ body {
   height: 100vh;
   width: 100vw;
 }
+.cell {
+  background: #1f1c60;
+}
 header {
   background-color: #100e1a;
   color: white;
   display: flex;
-  justify-content: start;
+  justify-content: space-around;
   align-items: center;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   border: 0px;
+  height: 60px;
 }
 .header-module {
   display: flex;
@@ -70,17 +74,28 @@ button {
 button:hover {
   background-color: #4547e0;
 }
-/* button::after {
+#addButton::after {
   content: "";
   display: block;
   height: 20px;
-  width: 100px;
-  position: relative;
+  width: 70px;
+  position: absolute;
   background: #100e1a;
-  top: -20px;
-  left: -145px;
+  top: 30px;
+  left: 95px;
   z-index: 1;
-} */
+}
+#removeButton::after {
+  content: "";
+  display: block;
+  height: 20px;
+  width: 90px;
+  position: absolute;
+  background: #100e1a;
+  top: 30px;
+  left: 1028px;
+  z-index: 1;
+}
 .node {
   display: flex;
   justify-self: center;

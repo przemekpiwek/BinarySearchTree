@@ -3,7 +3,8 @@ const addButt = document.querySelector("#addButton");
 const remButt = document.querySelector("#removeButton");
 const addInput = document.querySelector("#addNodeInput");
 const remInput = document.querySelector("#removeNodeInput");
-let arrayOfNodesToRemove = [];
+const svgBox = document.querySelector(".svgbox");
+let arrayOfNodesPlaceholder = [];
 
 addButt.addEventListener("click", addNodeHandler);
 remButt.addEventListener("click", remNodeHandler);
@@ -15,16 +16,15 @@ class Node {
     this.value = value;
     this.left = null;
     this.right = null;
-    // this.positionX = null;
-    // this.positionY = null;
     this.rowCell = null;
     this.colCell = null;
+
+    this.positionX = null;
+    this.positionY = null;
   }
   createDom() {
     let nodeEl = document.createElement("inline-block");
     let nodeText = document.createElement("p");
-    // nodeEl.style.left = this.positionX;
-    // nodeEl.style.top = this.positionY;
     nodeEl.style.gridColumnStart = `${this.colCell}`;
     nodeEl.style.gridRowStart = `${this.rowCell}`;
     nodeText.innerText = `${this.value}`;
@@ -34,6 +34,7 @@ class Node {
     grid.appendChild(nodeEl);
   }
 }
+let nodeObj;
 
 class Tree {
   constructor() {
@@ -42,32 +43,28 @@ class Tree {
   addNode(value) {
     let newNode = new Node(value);
     let curNode;
+    nodeObj = newNode;
 
     if (this.root === null) {
       this.root = newNode;
       curNode = newNode;
       curNode.rowCell = 1;
       curNode.colCell = 6;
-      // curNode.positionX = `${window.innerWidth / 2 - 50}px`;
-      // curNode.positionY = "0px";
     } else {
       curNode = this.searchForNode(value)["curNode"];
       if (curNode.value > newNode.value) {
-        console.log(`the ${value} is lower than the new node`);
         curNode.left = newNode;
         newNode.rowCell = curNode.rowCell + 1;
         newNode.colCell = curNode.colCell - 1;
-        // newNode.positionX = `${parseInt(curNode.positionX, 10) - 100}px`;
-        // newNode.positionY = `${parseInt(curNode.positionY, 10) + 100}px`;
       } else {
         curNode.right = newNode;
         newNode.rowCell = curNode.rowCell + 1;
         newNode.colCell = curNode.colCell + 1;
-        // newNode.positionX = `${parseInt(curNode.positionX, 10) + 100}px`;
-        // newNode.positionY = `${parseInt(curNode.positionY, 10) + 100}px`;
       }
     }
     newNode.createDom();
+    this.clearLines();
+    this.createLines(this.root);
   }
   removeNode(value) {
     const { curNode: nodeToRemove, parent } = this.searchForNode(value);
@@ -78,8 +75,8 @@ class Tree {
       const removedNodeChildren = this.mergeSubBranch(nodeToRemove);
       const removedNodeDom = document.getElementById(`${nodeToRemove.value}`);
       if (value === this.root.value) {
-        this.root = removedNodeChildren;
         this.root = null;
+        this.root = removedNodeChildren;
         //need to adjust position
       } else if (parent.right && parent.right.value === nodeToRemove.value) {
         parent.right = removedNodeChildren;
@@ -88,6 +85,8 @@ class Tree {
       }
       grid.removeChild(removedNodeDom);
     }
+    this.clearLines();
+    this.createLines(this.root);
   }
   searchForNode(value) {
     let testNode = this.root;
@@ -137,7 +136,7 @@ class Tree {
       return;
     } else {
       this.arrayNodes(subBranch);
-      let nodeArr = arrayOfNodesToRemove;
+      let nodeArr = arrayOfNodesPlaceholder;
       if (dir === "from right") {
         nodeArr.forEach((node) => {
           const nodeDom = document.getElementById(`${node.value}`);
@@ -163,11 +162,11 @@ class Tree {
           nodeDom.style.gridRowStart = node.rowCell;
         });
       }
-      arrayOfNodesToRemove = [];
+      arrayOfNodesPlaceholder = [];
     }
   }
   arrayNodes(node) {
-    arrayOfNodesToRemove.push(node);
+    arrayOfNodesPlaceholder.push(node);
     if (!node.right && !node.left) {
       return;
     } else if (node.left && node.right) {
@@ -179,14 +178,61 @@ class Tree {
       this.arrayNodes(node.left);
     }
   }
+
+  createLines(node) {
+    //pass in new node
+    let nodeObj = $(`#${node.value}`);
+    let nodePos = nodeObj.position();
+    let svg = document.querySelector("svg");
+
+    if (node.left) {
+      let nodeLeft = $(`#${node.left.value}`);
+      let leftPos = nodeLeft.position();
+      let newLine = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+      );
+      newLine.setAttribute("id", "line");
+      newLine.setAttribute("x1", `${nodePos.left + 80}`);
+      newLine.setAttribute("y1", `${nodePos.top - 80}`);
+      newLine.setAttribute("x2", `${leftPos.left + 80}`);
+      newLine.setAttribute("y2", `${leftPos.top - 80}`);
+      newLine.setAttribute("stroke", "white");
+      newLine.setAttribute("stroke-width", "3");
+      svg.appendChild(newLine);
+      this.createLines(node.left);
+    }
+    if (node.right) {
+      let nodeRight = $(`#${node.right.value}`);
+      let rightPos = nodeRight.position();
+      let newLine = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+      );
+      newLine.setAttribute("id", "line");
+      newLine.setAttribute("x1", `${nodePos.left + 80}`);
+      newLine.setAttribute("y1", `${nodePos.top - 80}`);
+      newLine.setAttribute("x2", `${rightPos.left + 80}`);
+      newLine.setAttribute("y2", `${rightPos.top - 80}`);
+      newLine.setAttribute("stroke", "white");
+      newLine.setAttribute("stroke-width", "3");
+      svg.appendChild(newLine);
+      this.createLines(node.right);
+    }
+  }
+
+  clearLines() {
+    let svg = document.querySelector("svg");
+    let lines = document.querySelectorAll("line");
+    lines.forEach((child) => svg.removeChild(child));
+  }
 }
 
 function addNodeHandler(e) {
   console.log(e);
   if (e.keyCode == 13 || e.type == "click") {
     if (addInput.value) {
-      console.log(addInput.value);
-      tree.addNode(addInput.value);
+      tree.addNode(Number(addInput.value));
       addInput.value = null;
     }
   }
@@ -194,8 +240,7 @@ function addNodeHandler(e) {
 function remNodeHandler(e) {
   if (e.keyCode == 13 || e.type == "click") {
     if (remInput.value) {
-      console.log(remInput.value);
-      tree.removeNode(remInput.value);
+      tree.removeNode(Number(remInput.value));
       remInput.value = null;
     }
   }
