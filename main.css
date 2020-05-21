@@ -43,8 +43,7 @@ header {
 }
 .header-module > div > label {
   font-size: 0.8em;
-  margin-bottom: -10px;
-  margin-left: 10px;
+  margin-bottom: 5px;
   z-index: 2;
 }
 .header-module > div > input {
@@ -73,9 +72,13 @@ button {
   background: #626ee3;
   text-align: center;
 }
+button:focus {
+  outline: none;
+}
 button:hover {
   background-color: #4547e0;
 }
+/* 
 #addButton::after {
   content: "";
   display: block;
@@ -86,6 +89,7 @@ button:hover {
   top: 30px;
   left: 580px;
   z-index: 1;
+  overflow: visible !important;
 }
 #removeButton::after {
   content: "";
@@ -97,6 +101,14 @@ button:hover {
   top: 30px;
   left: 1030px;
   z-index: 1;
+  overflow: visible !important;
+} */
+#addButton:active {
+  animation: wobble cubic-bezier(0.19, 1, 0.82, 1) 0.9s;
+}
+
+#removeButton:active {
+  animation: wobble cubic-bezier(0.19, 1, 0.82, 1) 0.9s;
 }
 .node {
   display: flex;
@@ -108,10 +120,18 @@ button:hover {
   width: 50px;
   height: 50px;
   justify-content: center;
+  position: relative;
+  z-index: 3;
 }
 .node:hover {
   background-color: #4547e0;
 }
 p {
   line-height: 1em;
+}
+
+@keyframes wobble {
+  50% {
+    background-color: red;
+  }
 }

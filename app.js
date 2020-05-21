@@ -3,7 +3,6 @@ const addButt = document.querySelector("#addButton");
 const remButt = document.querySelector("#removeButton");
 const addInput = document.querySelector("#addNodeInput");
 const remInput = document.querySelector("#removeNodeInput");
-const svgBox = document.querySelector(".svgbox");
 let arrayOfNodesPlaceholder = [];
 
 addButt.addEventListener("click", addNodeHandler);
@@ -41,36 +40,40 @@ class Tree {
     this.root = null;
   }
   addNode(value) {
-    let newNode = new Node(value);
-    let curNode;
-    nodeObj = newNode;
-
-    if (this.root === null) {
-      this.root = newNode;
-      curNode = newNode;
-      curNode.rowCell = 1;
-      curNode.colCell = 6;
+    if (!value) {
+      alert("please add value");
     } else {
-      curNode = this.searchForNode(value)["curNode"];
-      if (curNode.value > newNode.value) {
-        curNode.left = newNode;
-        newNode.rowCell = curNode.rowCell + 1;
-        newNode.colCell = curNode.colCell - 1;
+      let newNode = new Node(value);
+      let curNode;
+      nodeObj = newNode;
+
+      if (this.root === null) {
+        this.root = newNode;
+        curNode = newNode;
+        curNode.rowCell = 1;
+        curNode.colCell = 6;
       } else {
-        curNode.right = newNode;
-        newNode.rowCell = curNode.rowCell + 1;
-        newNode.colCell = curNode.colCell + 1;
+        curNode = this.searchForNode(value)["curNode"];
+        if (curNode.value > newNode.value) {
+          curNode.left = newNode;
+          newNode.rowCell = curNode.rowCell + 1;
+          newNode.colCell = curNode.colCell - 1;
+        } else {
+          curNode.right = newNode;
+          newNode.rowCell = curNode.rowCell + 1;
+          newNode.colCell = curNode.colCell + 1;
+        }
       }
+      newNode.createDom();
+      this.clearLines();
+      this.createLines(this.root);
     }
-    newNode.createDom();
-    this.clearLines();
-    this.createLines(this.root);
   }
   removeNode(value) {
+    //fix so that if given value is not found, return alert
     const { curNode: nodeToRemove, parent } = this.searchForNode(value);
-    console.log(nodeToRemove);
-    if (!nodeToRemove) {
-      console.log("Node not found");
+    if (!nodeToRemove || nodeToRemove.value !== value) {
+      alert("Node not found");
     } else {
       const removedNodeChildren = this.mergeSubBranch(nodeToRemove);
       const removedNodeDom = document.getElementById(`${nodeToRemove.value}`);
@@ -185,9 +188,6 @@ class Tree {
     const nodePos = document
       .getElementById(`${node.value}`)
       .getBoundingClientRect();
-
-    console.log(nodePos);
-
     if (node.left) {
       const leftPos = document
         .getElementById(`${node.left.value}`)
@@ -200,6 +200,8 @@ class Tree {
       // console.log(leftPos);
 
       newLine.setAttribute("id", "line");
+      newLine.setAttribute("position", "absolute");
+      newLine.setAttribute("z-index", "-1");
       newLine.setAttribute("x1", `${nodePos.x + 90 - (6 - node.colCell) * 10}`);
       newLine.setAttribute(
         "y1",
@@ -215,7 +217,7 @@ class Tree {
       );
       newLine.setAttribute("stroke", "white");
       newLine.setAttribute("stroke-width", "3");
-      svg.appendChild(newLine);
+      svg.prepend(newLine);
       this.createLines(node.left);
     }
     if (node.right) {
@@ -227,6 +229,8 @@ class Tree {
         "line"
       );
 
+      newLine.setAttribute("position", "absolute");
+      newLine.setAttribute("z-index", "-1");
       // console.log(rightPos);
 
       newLine.setAttribute("id", "line");
@@ -245,7 +249,7 @@ class Tree {
       );
       newLine.setAttribute("stroke", "white");
       newLine.setAttribute("stroke-width", "3");
-      svg.appendChild(newLine);
+      svg.prepend(newLine);
       this.createLines(node.right);
     }
   }
@@ -255,6 +259,17 @@ class Tree {
     let lines = document.querySelectorAll("line");
     lines.forEach((child) => svg.removeChild(child));
   }
+
+  // renderNodes() {
+  //   let nodes = document.querySelectorAll(".node");
+  //   nodes.forEach((node) => {
+  //     grid.removeChild(node);
+  //   });
+  //   nodes.forEach((node) => {
+  //     grid.appendChild(node);
+  //   });
+  //   console.log(nodes);
+  // }
 }
 
 function addNodeHandler(e) {
