@@ -241,7 +241,7 @@ class Tree {
       newLine.setAttribute("x1", `${nodePos.x + 40 + (node.colCell - 6) * 10}`);
       newLine.setAttribute(
         "y1",
-        `${nodePos.y - 100 + (node.rowCell - 1) * 10}`
+        `${nodePos.top - 100 + (node.rowCell - 1) * 10}`
       );
       newLine.setAttribute(
         "x2",
@@ -249,7 +249,7 @@ class Tree {
       );
       newLine.setAttribute(
         "y2",
-        `${rightPos.y - 110 + node.right.rowCell * 10}`
+        `${rightPos.top - 110 + node.right.rowCell * 10}`
       );
       newLine.setAttribute("stroke", "white");
       newLine.setAttribute("stroke-width", "3");
