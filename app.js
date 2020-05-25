@@ -206,7 +206,7 @@ class Tree {
       // newLine.setAttribute("y1", `${nodePos.top}`);
       // newLine.setAttribute("x2", `${leftPos.x}`);
       // newLine.setAttribute("y2", `${leftPos.top}`);
-      // newLine.setAttribute("x1", `${nodePos.x + 90 - (6 - node.colCell) * 10}`);
+      newLine.setAttribute("x1", `${nodePos.x + 90 - (6 - node.colCell) * 10}`);
       newLine.setAttribute(
         "y1",
         `${nodePos.top + 22.5 - 100 + (node.rowCell - 1) * 10}`
