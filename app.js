@@ -202,23 +202,23 @@ class Tree {
       newLine.setAttribute("id", "line");
       newLine.setAttribute("position", "absolute");
       newLine.setAttribute("z-index", "-1");
-      newLine.setAttribute("x1", `${nodePos.x}`);
-      newLine.setAttribute("y1", `${nodePos.top}`);
-      newLine.setAttribute("x2", `${leftPos.x}`);
-      newLine.setAttribute("y2", `${leftPos.top}`);
+      // newLine.setAttribute("x1", `${nodePos.x}`);
+      // newLine.setAttribute("y1", `${nodePos.top}`);
+      // newLine.setAttribute("x2", `${leftPos.x}`);
+      // newLine.setAttribute("y2", `${leftPos.top}`);
       // newLine.setAttribute("x1", `${nodePos.x + 90 - (6 - node.colCell) * 10}`);
-      // newLine.setAttribute(
-      //   "y1",
-      //   `${nodePos.top + 22.5 - 100 + (node.rowCell - 1) * 10}`
-      // );
-      // newLine.setAttribute(
-      //   "x2",
-      //   `${leftPos.x + 90 - (6 - node.left.colCell) * 10}`
-      // );
-      // newLine.setAttribute(
-      //   "y2",
-      //   `${leftPos.top + 22.5 - 110 + node.left.rowCell * 10}`
-      // );
+      newLine.setAttribute(
+        "y1",
+        `${nodePos.top + 22.5 - 100 + (node.rowCell - 1) * 10}`
+      );
+      newLine.setAttribute(
+        "x2",
+        `${leftPos.x + 90 - (6 - node.left.colCell) * 10}`
+      );
+      newLine.setAttribute(
+        "y2",
+        `${leftPos.top + 22.5 - 110 + node.left.rowCell * 10}`
+      );
       newLine.setAttribute("stroke", "white");
       newLine.setAttribute("stroke-width", "3");
       svg.prepend(newLine);
