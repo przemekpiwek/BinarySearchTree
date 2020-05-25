@@ -206,10 +206,10 @@ class Tree {
       // newLine.setAttribute("y1", `${nodePos.top}`);
       // newLine.setAttribute("x2", `${leftPos.x}`);
       // newLine.setAttribute("y2", `${leftPos.top}`);
-      newLine.setAttribute("x1", `${nodePos.x + 40 - (6 - node.colCell) * 10}`);
+      newLine.setAttribute("x1", `${nodePos.x + 30 - (6 - node.colCell) * 10}`);
       newLine.setAttribute(
         "y1",
-        `${nodePos.top - 100 + (node.rowCell - 1) * 10}`
+        `${nodePos.top - 90 + (node.rowCell - 1) * 10}`
       );
       newLine.setAttribute(
         "x2",
@@ -238,10 +238,10 @@ class Tree {
       // console.log(rightPos);
 
       newLine.setAttribute("id", "line");
-      newLine.setAttribute("x1", `${nodePos.x + 40 + (node.colCell - 6) * 10}`);
+      newLine.setAttribute("x1", `${nodePos.x + 30 + (node.colCell - 6) * 10}`);
       newLine.setAttribute(
         "y1",
-        `${nodePos.top - 100 + (node.rowCell - 1) * 10}`
+        `${nodePos.top - 90 + (node.rowCell - 1) * 10}`
       );
       newLine.setAttribute(
         "x2",
